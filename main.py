@@ -15,7 +15,9 @@ from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def acp_api_send_request(browser, message_type, data={}):
+def acp_api_send_request(browser, message_type, data=None):
+    if data is None:
+        data = {}
     message = {
         'receiver': 'antiCaptchaPlugin',
         'type': message_type,
@@ -34,8 +36,7 @@ def create_browser(anti_captcha_api_key: str) -> WebDriver:
     browser = Chrome(options=options, service=service)
     browser.delete_all_cookies()
     browser.get('https://antcpt.com/blank.html')
-    # Устанавливаем API ключ anti-captcha.com
-    # https://anti-captcha.com/clients/settings/apisetup
+    print("Сейчас произошла установка вашего ключа в расширение. Все в порядке =)")
     acp_api_send_request(
         browser,
         'setOptions',
@@ -43,16 +44,13 @@ def create_browser(anti_captcha_api_key: str) -> WebDriver:
     )
     return browser
 
-    # browser = uc.Chrome(options=options, service=service)
-    # browser = uc.Chrome()
-    # browser.get('https://antcpt.com/blank.html')
-
 
 def find_max_values(browser: WebDriver):
     but: WebElement = browser.find_element(by=By.XPATH, value="/html/body/div[1]/div[3]/div/div[3]/div[2]/span/i")
     but.click()
-    sleep(1)
+    sleep(2)
     div = browser.find_element(by=By.XPATH, value="/html/body/div[6]/div/div/div/div/div[2]")
+    print("В зависимости от количества глав, сейчас может слегка зависнуть. Ничего не трогайте!")
     dict_all_chapters = {}
     for i in div.find_elements(by=By.TAG_NAME, value="a"):
         if type(dict_all_chapters.get(i.text.split()[1])) is list:
@@ -82,12 +80,13 @@ def parse_and_save():
 
     url = BASE_URL + TITLE_URL
     print("Окно хрома НЕ ТРОГАТЬ! НЕ ЗАКРЫВАТЬ! НЕ МЕНЯТЬ ЕГО РАЗМЕР! Можно только спрятать в панель задач! ЭТО ВАЖНО!")
-    sleep(5)
+    sleep(3)
     browser = create_browser('d7f97cff8fc60c495a2ebbef748dd096')
     browser.get(url)
     sleep(2)
-    title = browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div[2]/div/div[2]/div[1]/div[1]/div[1]").text
-    browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div[2]/div/div[1]/div[2]/a").click()
+    title = browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div/div/div[2]/div[1]/div[1]/div[1]").text
+
+    browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div/div/div[1]/div[2]/a").click()
     sleep(3)
     all_chapters = find_max_values(browser)
     browser.set_page_load_timeout(3)
