@@ -144,4 +144,5 @@ def parse_and_save():
             sleep(1)
 
 
-parse_and_save()
+if __name__ == "__main__":
+    parse_and_save()
