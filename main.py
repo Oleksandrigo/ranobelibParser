@@ -164,6 +164,7 @@ def parse_and_save():
     while True:
         try:
             doc_file.save(f"{title}.docx")
+            print("ГОТОВО!")
             break
         except PermissionError:
             print(f"Close the {title}.docx!!")
