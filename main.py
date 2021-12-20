@@ -58,7 +58,7 @@ def find_max_values(browser: WebDriver):
             return "FAIL|find_max_values second_try"
     except:
         return "FAIL|find_max_values first_try"
-
+    print("Открываем список глав дла парсинга...")
     but.click()
     sleep(3)
     div = browser.find_element(by=By.XPATH, value="/html/body/div[6]/div/div/div/div/div[2]")
@@ -107,11 +107,11 @@ def parse_and_save():
     if all_chapters is str:
         if "FAIL" in all_chapters:
             print("Во время выполнения программы произошёл сильный баг. Отпишите разрабочику на гитхаб.")
-
+            print(all_chapters)
         return
     print("Получилось!")
     browser.set_page_load_timeout(3)
-
+    print("Начинаем парсинг всех глав!")
     doc_file = Document()
     title_head = doc_file.add_heading(title, 0)
     title_head.style.font.color.rgb = RGBColor.from_string("000000")
