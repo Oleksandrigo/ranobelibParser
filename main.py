@@ -15,7 +15,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import undetected_chromedriver as u
 
 
-def acp_api_send_request(browser, message_type, data=None):
+def acp_api_send_request(browser, message_type, data=None) -> None:
     if data is None:
         data = {}
     message = {
@@ -45,10 +45,12 @@ def create_browser(anti_captcha_api_key: str) -> WebDriver:
     return browser
 
 
-def find_max_values(browser: WebDriver):
+def find_max_values(browser: WebDriver) -> dict:
     but: WebElement = browser.find_element(by=By.XPATH, value="/html/body/div[1]/div[3]/div/div[3]/div[2]/span/i")
+    # but: WebElement = browser.find_element(by=By.LINK_TEXT, value="Начать читать")
+    # but: WebElement = browser.find_element(by=By.TAG_NAME, value="a")
     but.click()
-    sleep(2)
+    sleep(3)
     div = browser.find_element(by=By.XPATH, value="/html/body/div[6]/div/div/div/div/div[2]")
     print("В зависимости от количества глав, сейчас может слегка зависнуть. Ничего не трогайте!")
     dict_all_chapters = {}
@@ -61,24 +63,21 @@ def find_max_values(browser: WebDriver):
 
 
 BASE_URL = "https://ranobelib.me"
-# TITLE_URL = "/longwang-chuan"
-# TITLE_URL = "/sokushi-cheat-ga-saikyou-sugite-isekai-no-yatsura-ga-marude-aite-ni-naranai-n-desu-ga-ln"
-TITLE_URL: str
 VOLUME_URL = "/v"
 CHAPTER_URL = "/c"
 
 
 def parse_and_save():
-    global TITLE_URL
+    title_url = ""
     input_url = input("Введите ссылку на ранобе в ranobelib.me для парсинга.\n")
     if BASE_URL in input_url:
         s = input_url.split("ranobelib.me")[1]
         if len(s.split("/")) > 2:
-            TITLE_URL = "/" + s.split("/")[1]
+            title_url = "/" + s.split("/")[1]
         if "?" in s:
-            TITLE_URL = s.split("?")[0].strip()
+            title_url = s.split("?")[0].strip()
 
-    url = BASE_URL + TITLE_URL
+    url = BASE_URL + title_url
     print("Окно хрома НЕ ТРОГАТЬ! НЕ ЗАКРЫВАТЬ! НЕ МЕНЯТЬ ЕГО РАЗМЕР! Можно только спрятать в панель задач! ЭТО ВАЖНО!")
     sleep(3)
     api_key_anti = 'd7f97cff8fc60c495a2ebbef748dd096'
