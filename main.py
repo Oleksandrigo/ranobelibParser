@@ -4,7 +4,6 @@ from re import findall
 from time import sleep
 
 from docx import Document
-import undetected_chromedriver as uc
 from docx.shared import Pt, RGBColor
 from selenium.common import exceptions as sel_exeptions
 from selenium.webdriver import Chrome, ChromeOptions
@@ -13,6 +12,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
+import undetected_chromedriver as u
 
 
 def acp_api_send_request(browser, message_type, data=None):
@@ -81,7 +81,8 @@ def parse_and_save():
     url = BASE_URL + TITLE_URL
     print("Окно хрома НЕ ТРОГАТЬ! НЕ ЗАКРЫВАТЬ! НЕ МЕНЯТЬ ЕГО РАЗМЕР! Можно только спрятать в панель задач! ЭТО ВАЖНО!")
     sleep(3)
-    browser = create_browser('d7f97cff8fc60c495a2ebbef748dd096')
+    api_key_anti = 'd7f97cff8fc60c495a2ebbef748dd096'
+    browser = create_browser(api_key_anti)
     browser.get(url)
     sleep(2)
     title = browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div/div/div[2]/div[1]/div[1]/div[1]").text
