@@ -90,7 +90,16 @@ def parse_and_save():
     url = BASE_URL + title_url
     print("Окно хрома НЕ ТРОГАТЬ! НЕ ЗАКРЫВАТЬ! НЕ МЕНЯТЬ ЕГО РАЗМЕР! Можно только спрятать в панель задач! ЭТО ВАЖНО!")
     sleep(3)
-    api_key_anti = 'd7f97cff8fc60c495a2ebbef748dd096'
+    # api_key_anti = 'd7f97cff8fc60c495a2ebbef748dd096'
+    print("Введите 32 значный ключ, который вы получили после регистрации на сайте")
+    api_key_anti = input("https://anti-captcha.com/clients/settings/apisetup\n")
+    if len(api_key_anti) == 32:
+        if not api_key_anti.isalnum():
+            print("В ключе присутствуют спецсимволы. Это плохо!")
+            return
+        print("Длина ключа не равна 32.")
+        return
+
     browser = create_browser(api_key_anti)
     print("Запущен браузер. (chromedriver)")
     browser.get(url)
@@ -104,7 +113,7 @@ def parse_and_save():
     sleep(3)
     print("Пытаемся получить кол-во глав и томов")
     all_chapters = find_max_values(browser)
-    if all_chapters is str:
+    if type(all_chapters) is str:
         if "FAIL" in all_chapters:
             print("Во время выполнения программы произошёл сильный баг. Отпишите разрабочику на гитхаб.")
             print(all_chapters)
