@@ -93,11 +93,11 @@ def parse_and_save():
     # api_key_anti = 'd7f97cff8fc60c495a2ebbef748dd096'
     print("Введите 32 значный ключ, который вы получили после регистрации на сайте")
     api_key_anti = input("https://anti-captcha.com/clients/settings/apisetup\n")
-    if len(api_key_anti) == 32:
-        if not api_key_anti.isalnum():
-            print("В ключе присутствуют спецсимволы. Это плохо!")
-            return
+    if not len(api_key_anti) == 32:
         print("Длина ключа не равна 32.")
+        return
+    if not api_key_anti.isalnum():
+        print("В ключе присутствуют спецсимволы. Это плохо!")
         return
 
     browser = create_browser(api_key_anti)
