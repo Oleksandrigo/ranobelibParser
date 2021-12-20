@@ -45,10 +45,20 @@ def create_browser(anti_captcha_api_key: str) -> WebDriver:
     return browser
 
 
-def find_max_values(browser: WebDriver) -> dict:
-    but: WebElement = browser.find_element(by=By.XPATH, value="/html/body/div[1]/div[3]/div/div[3]/div[2]/span/i")
-    # but: WebElement = browser.find_element(by=By.LINK_TEXT, value="Начать читать")
-    # but: WebElement = browser.find_element(by=By.TAG_NAME, value="a")
+def find_max_values(browser: WebDriver):
+    # Сейчас мы на странице первой главы
+    # Найти кнопку с оглавлением
+    # Кнопка оглавления
+    try:
+        but = browser.find_element(by=By.XPATH, value="/html/body/div[1]/div[3]/div/div[3]/div[2]")
+    except sel_exeptions.NoSuchElementException:
+        try:
+            but = browser.find_element(by=By.XPATH, value="/html/body/div[1]/div[3]/div/div[2]/div")
+        except:
+            return "FAIL|find_max_values second_try"
+    except:
+        return "FAIL|find_max_values first_try"
+
     but.click()
     sleep(3)
     div = browser.find_element(by=By.XPATH, value="/html/body/div[6]/div/div/div/div/div[2]")
@@ -82,13 +92,24 @@ def parse_and_save():
     sleep(3)
     api_key_anti = 'd7f97cff8fc60c495a2ebbef748dd096'
     browser = create_browser(api_key_anti)
+    print("Запущен браузер. (chromedriver)")
     browser.get(url)
+    print("Открывается ссылка, введенная ползьователем")
     sleep(2)
     title = browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div/div/div[2]/div[1]/div[1]/div[1]").text
-
-    browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div/div/div[1]/div[2]/a").click()
+    print(title)
+    # browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div/div/div[1]/div[2]/a").click()
+    print("Переходим на страницу первой главы")
+    browser.find_element(by=By.LINK_TEXT, value="Начать читать").click()
     sleep(3)
+    print("Пытаемся получить кол-во глав и томов")
     all_chapters = find_max_values(browser)
+    if all_chapters is str:
+        if "FAIL" in all_chapters:
+            print("Во время выполнения программы произошёл сильный баг. Отпишите разрабочику на гитхаб.")
+
+        return
+    print("Получилось!")
     browser.set_page_load_timeout(3)
 
     doc_file = Document()
