@@ -90,7 +90,6 @@ def parse_and_save():
     url = BASE_URL + title_url
     print("Окно хрома НЕ ТРОГАТЬ! НЕ ЗАКРЫВАТЬ! НЕ МЕНЯТЬ ЕГО РАЗМЕР! Можно только спрятать в панель задач! ЭТО ВАЖНО!")
     sleep(3)
-    # api_key_anti = 'd7f97cff8fc60c495a2ebbef748dd096'
     print("Введите 32 значный ключ, который вы получили после регистрации на сайте")
     api_key_anti = input("https://anti-captcha.com/clients/settings/apisetup\n")
     if not len(api_key_anti) == 32:
