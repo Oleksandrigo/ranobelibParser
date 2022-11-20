@@ -25,7 +25,6 @@ def create_browser() -> WebDriver:
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--no-sandbox")
-    options.add_extension(os.path.join(os.getcwd(), 'anticaptcha-plugin_v0.61.zip'))
     service = Service(ChromeDriverManager().install())
     browser = Chrome_UC(options=options, service=service)
     # browser = Chrome(options=options, service=service)
