@@ -80,7 +80,7 @@ def parse_chapers(name_title: str, chapters: list[tuple[str, str]]):
     doc_file = Document()
     new_parser = HtmlToDocx()
 
-    for num, name, url_chapt in enumerate(chapters):
+    for num, (name, url_chapt) in enumerate(chapters):
         os.system('cls||clear')
         print(f"{num + 1} / {len(chapters)}")
         chapter: HTMLResponse | Response = session.get(url_chapt)
