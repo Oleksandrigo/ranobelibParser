@@ -5,7 +5,7 @@ from docx.shared import RGBColor
 from htmldocx import HtmlToDocx
 
 from selenium.common import exceptions as sel_exeptions
-from selenium.webdriver import Chrome, ChromeOptions, Keys
+from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
