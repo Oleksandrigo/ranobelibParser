@@ -24,9 +24,9 @@ BASE_URL = "https://ranobelib.me"
 
 def create_browser() -> WebDriver:
     options = ChromeOptions()
-    # options.add_argument("--disable-blink-features=AutomationControlled")
-    # options.add_argument("--ignore-certificate-errors")
-    # options.add_argument("--no-sandbox")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--ignore-certificate-errors")
+    options.add_argument("--no-sandbox")
     service = Service(ChromeDriverManager().install())
     capa = DesiredCapabilities.CHROME
     capa["pageLoadStrategy"] = "none"
