@@ -1,14 +1,16 @@
 import os
+import time
 
 from docx import Document
 from docx.shared import RGBColor
 from htmldocx import HtmlToDocx
 
 from selenium.common import exceptions as sel_exeptions
-from selenium.webdriver import Chrome, ChromeOptions
+from selenium.webdriver import Chrome, ChromeOptions, DesiredCapabilities
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 from webdriver_manager.chrome import ChromeDriverManager
 from undetected_chromedriver import Chrome as Chrome_UC
@@ -22,11 +24,13 @@ BASE_URL = "https://ranobelib.me"
 
 def create_browser() -> WebDriver:
     options = ChromeOptions()
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--ignore-certificate-errors")
-    options.add_argument("--no-sandbox")
+    # options.add_argument("--disable-blink-features=AutomationControlled")
+    # options.add_argument("--ignore-certificate-errors")
+    # options.add_argument("--no-sandbox")
     service = Service(ChromeDriverManager().install())
-    browser = Chrome_UC(options=options, service=service)
+    capa = DesiredCapabilities.CHROME
+    capa["pageLoadStrategy"] = "none"
+    browser = Chrome_UC(options=options, service=service, desired_capabilities=capa)
     # browser = Chrome(options=options, service=service)
     browser.delete_all_cookies()
     return browser
@@ -99,6 +103,7 @@ def parse_chapers(name_title: str, chapters: list[tuple[str, str]]):
 
 
 def start_parse(link: str):
+    time_wait = 5.0
     title_url = get_title_url(link)
     url = BASE_URL + title_url
     browser: WebDriver = create_browser()
@@ -108,6 +113,7 @@ def start_parse(link: str):
     print("Не трогайте, не двигайте, не меняйте размеры. НИКАК НЕ ВЗАИМОДЕЙСТВУЙТЕ С ЭТИМ ОКНОМ!!")
     print("Открывается ссылка, введенная ползьователем")
     browser.get(url)
+    time.sleep(time_wait)
     main_title = browser.find_element(by=By.XPATH,
                                       value="/html/body/div[3]/div/div/div/div[2]/div[1]/div[1]/div[1]").text
     alt_title = browser.find_element(by=By.XPATH,
@@ -115,6 +121,11 @@ def start_parse(link: str):
     print(main_title, alt_title)
     print("Переходим на страницу первой главы")
     browser.find_element(by=By.LINK_TEXT, value="Начать читать").click()
+    time.sleep(time_wait)
+    try:
+        browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div/div[2]/div/button[2]").click()
+    except Exception:
+        pass
     print("Получаем список глав")
     chapters = get_all_chapters(browser)
 
@@ -125,6 +136,6 @@ def start_parse(link: str):
 
 
 if __name__ == "__main__":
-    input_url = input("Введите ссылку на ранобе в ranobelib.me для парсинга.\n")
-    # input_url = "https://ranobelib.me/the-novels-extra?section=chapters"
+    # input_url = input("Введите ссылку на ранобе в ranobelib.me для парсинга.\n")
+    input_url = "https://ranobelib.me/longwang-chuan?section=info"
     start_parse(input_url)
