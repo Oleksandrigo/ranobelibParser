@@ -38,7 +38,7 @@ def create_browser() -> WebDriver:
 def get_title_url(link: str) -> str:
     title_url = ""
     if BASE_URL in link:
-        s = link.split("ranobelib.me")[1]
+        s = link.split(BASE_URL)[1]
         if len(s.split("/")) > 2:
             title_url = "/" + s.split("/")[1]
         if "?" in s:
@@ -75,7 +75,8 @@ def get_all_chapters(browser: WebDriver) -> list[tuple[str, str]]:
     chapters = []
     for chapt in chapters_divs[::-1]:
         if not chapt.text.strip() or not chapt.attrs.get("href"):
-            print("Почему-то у названия главы на нашелся текст или ссылка. Попробуйте снова.")
+            print("У названия главы на найден текст или ссылка.\n"
+                  "Попробуйте снова.")
             quit()
 
         chapters.append((chapt.text, BASE_URL + chapt.attrs.get("href")))
