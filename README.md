@@ -1,4 +1,5 @@
-# ranobelibParser
+# ranobelib Parser
+# ranobelib Downloader
 
 Парсер который позволяет скачать главы с ranobeLib.me.
 
