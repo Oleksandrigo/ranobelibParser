@@ -3,6 +3,7 @@ import time
 
 from docx import Document
 from docx.shared import RGBColor
+from docx.text.paragraph import Paragraph
 from htmldocx import HtmlToDocx
 
 from selenium.common import exceptions as sel_exeptions
@@ -50,21 +51,28 @@ def get_title_url(link: str) -> str:
 
 def get_all_chapters(browser: WebDriver) -> list[tuple[str, str]]:
     print("В зависимости от количества глав, сейчас может слегка зависнуть. Ничего не трогайте!")
-    chapters_vars = ["/html/body/div[1]/div[3]/div/div[2]/div/div[1]",
-                     "/html/body/div[1]/div[3]/div/div[3]/div[2]"]
+    chapters_vars = ["/html/body/div[1]/div[3]/div/div[3]/div[2]",
+                     "/html/body/div[1]/div[3]/div/div[2]/div/div[1]"]
     try:
         chapters_div = browser.find_element(by=By.XPATH, value=chapters_vars[0])
         chapters_div.click()
+
     except Exception:
         chapters_div = browser.find_element(by=By.XPATH, value=chapters_vars[1])
         chapters_div.click()
 
+    time.sleep(2)
     chapters_divs = browser.find_element(
-        by=By.XPATH, value="/html/body/div[6]/div/div/div/div/div[2]").find_elements(by=By.TAG_NAME, value="a")
+        by=By.XPATH, value="/html/body/div[6]/div/div/div/div").find_element(
+        by=By.CSS_SELECTOR, value="div.modal__body").find_elements(
+        by=By.TAG_NAME, value="a")
 
     chapters = []
     for chapt in chapters_divs[::-1]:
         chapters.append((chapt.text, chapt.get_attribute("href")))
+        if not chapt.text.strip():
+            print("Почему-то у названия главы на нашелся текст. Попробуйте снова.")
+            quit()
 
     return chapters
 
@@ -91,13 +99,27 @@ def parse_chapers(name_title: str, chapters: list[tuple[str, str]]):
         if chapter.status_code == 200:
             datas = chapter.html.find("div.reader-container.container.container_center")
 
-            title_head = doc_file.add_heading(name, 1)
+            title_head: Paragraph = doc_file.add_heading(name, 1)
             title_head.style.font.color.rgb = RGBColor.from_string("000000")
             new_parser.add_html_to_document(datas[0].html, doc_file)
         else:
             print("Произошла ошибка, страница скорее всего заблочена из-за слишком частых запросов.")
-            print("Отпишите разработчику на GitHub")
-            return
+            tries = 5
+            while tries >= 0:
+                print("")
+                print("Пробуем дождаться ответа страницы. ждем 10 секунд")
+                time.sleep(10)
+                chapter: HTMLResponse | Response = session.get(url_chapt)
+                if chapter.status_code != 200:
+                    tries -= 1
+                    continue
+                else:
+                    datas = chapter.html.find("div.reader-container.container.container_center")
+
+                    title_head: Paragraph = doc_file.add_heading(name, 1)
+                    title_head.style.font.color.rgb = RGBColor.from_string("000000")
+                    new_parser.add_html_to_document(datas[0].html, doc_file)
+                    break
 
     doc_file.save(f'{name_title}.docx')
 
@@ -110,7 +132,9 @@ def start_parse(link: str):
 
     print("Запущен браузер. (chromedriver)")
     print("Нужен только до получения списка глав, дальше закроется сам.")
-    print("Не трогайте, не двигайте, не меняйте размеры. НИКАК НЕ ВЗАИМОДЕЙСТВУЙТЕ С ЭТИМ ОКНОМ!!")
+    print("Не трогайте, не двигайте, не меняйте размеры, не сворачивайте. "
+          "НИКАК НЕ ВЗАИМОДЕЙСТВУЙТЕ С ЭТИМ ОКНОМ!!")
+    print("ПОКА ЭТО ОКНО САМО НЕ ЗАКРОЕТСЯ НЕ ПЕРЕКЛЮЧАЙТЕСЬ НА ДРУГИЕ ОКНА!!!!!!!")
     print("Открывается ссылка, введенная ползьователем")
     browser.get(url)
     time.sleep(time_wait)
@@ -124,6 +148,7 @@ def start_parse(link: str):
     time.sleep(time_wait)
     try:
         browser.find_element(by=By.XPATH, value="/html/body/div[3]/div/div/div[2]/div/button[2]").click()
+        time.sleep(3)
     except Exception:
         pass
     print("Получаем список глав")
