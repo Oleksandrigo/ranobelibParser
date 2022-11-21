@@ -136,6 +136,6 @@ def start_parse(link: str):
 
 
 if __name__ == "__main__":
-    # input_url = input("Введите ссылку на ранобе в ranobelib.me для парсинга.\n")
-    input_url = "https://ranobelib.me/longwang-chuan?section=info"
+    input_url = input("Введите ссылку на ранобе в ranobelib.me для парсинга.\n")
+    # input_url = "https://ranobelib.me/longwang-chuan?section=info"
     start_parse(input_url)
