@@ -7,18 +7,17 @@ from docx.text.paragraph import Paragraph
 from htmldocx import HtmlToDocx
 
 from selenium.common import exceptions as sel_exeptions
-from selenium.webdriver import Chrome, ChromeOptions, DesiredCapabilities
+from selenium.webdriver import ChromeOptions, DesiredCapabilities
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 
 from webdriver_manager.chrome import ChromeDriverManager
 from undetected_chromedriver import Chrome as Chrome_UC
 
 import cloudscraper
 from requests import Response
-from requests_html import HTMLSession, HTMLResponse
+from requests_html import HTMLSession, HTMLResponse, HTML
 
 BASE_URL = "https://ranobelib.me"
 
@@ -32,7 +31,6 @@ def create_browser() -> WebDriver:
     capa = DesiredCapabilities.CHROME
     capa["pageLoadStrategy"] = "none"
     browser = Chrome_UC(options=options, service=service, desired_capabilities=capa)
-    # browser = Chrome(options=options, service=service)
     browser.delete_all_cookies()
     return browser
 
@@ -62,18 +60,25 @@ def get_all_chapters(browser: WebDriver) -> list[tuple[str, str]]:
         chapters_div.click()
 
     time.sleep(2)
-    chapters_divs = browser.find_element(
-        by=By.XPATH, value="/html/body/div[6]/div/div/div/div").find_element(
-        by=By.CSS_SELECTOR, value="div.modal__body").find_elements(
-        by=By.TAG_NAME, value="a")
+    data = HTML(html=browser.page_source)
+    print("Браузер закрывается, так и должно быть.")
+
+    browser.quit()
+
+    chapters_divs = data.find("div.popup__content")
+    try:
+        chapters_divs = chapters_divs[0].find("div.modal__body")[0].find("a")
+    except Exception:
+        print("Не найден список глав на странице. БААААГ")
+        quit()
 
     chapters = []
     for chapt in chapters_divs[::-1]:
-        chapters.append((chapt.text, chapt.get_attribute("href")))
-        if not chapt.text.strip():
-            print("Почему-то у названия главы на нашелся текст. Попробуйте снова.")
+        if not chapt.text.strip() or not chapt.attrs.get("href"):
+            print("Почему-то у названия главы на нашелся текст или ссылка. Попробуйте снова.")
             quit()
 
+        chapters.append((chapt.text, BASE_URL + chapt.attrs.get("href")))
     return chapters
 
 
@@ -84,11 +89,12 @@ def parse_chapers(name_title: str, chapters: list[tuple[str, str]]):
     # r = scraper.get(url)
     # print("Запихивается в requsts-html")
     # res = HTML(html=r.text)
-
-    session = HTMLSession(browser_args=[
+    browser_args = [
         "--no-sandbox",
         "--disable-blink-features=AutomationControlled",
-        "--ignore-certificate-errors"])
+        "--ignore-certificate-errors"
+    ]
+    session = HTMLSession(browser_args=browser_args)
     doc_file = Document()
     new_parser = HtmlToDocx()
 
@@ -99,7 +105,7 @@ def parse_chapers(name_title: str, chapters: list[tuple[str, str]]):
         if chapter.status_code == 200:
             datas = chapter.html.find("div.reader-container.container.container_center")
 
-            title_head: Paragraph = doc_file.add_heading(name, 1)
+            title_head = doc_file.add_heading(name, 1)
             title_head.style.font.color.rgb = RGBColor.from_string("000000")
             new_parser.add_html_to_document(datas[0].html, doc_file)
         else:
@@ -135,7 +141,7 @@ def start_parse(link: str):
     print("Не трогайте, не двигайте, не меняйте размеры, не сворачивайте. "
           "НИКАК НЕ ВЗАИМОДЕЙСТВУЙТЕ С ЭТИМ ОКНОМ!!")
     print("ПОКА ЭТО ОКНО САМО НЕ ЗАКРОЕТСЯ НЕ ПЕРЕКЛЮЧАЙТЕСЬ НА ДРУГИЕ ОКНА!!!!!!!")
-    print("Открывается ссылка, введенная ползьователем")
+    print("Открывается ссылка, введенная пользователем")
     browser.get(url)
     time.sleep(time_wait)
     main_title = browser.find_element(by=By.XPATH,
@@ -153,8 +159,6 @@ def start_parse(link: str):
         pass
     print("Получаем список глав")
     chapters = get_all_chapters(browser)
-
-    browser.quit()
     print("Начинаем парсинг глав!")
     parse_chapers(main_title, chapters)
     print("Завершено!")
