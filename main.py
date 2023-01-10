@@ -15,7 +15,7 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from undetected_chromedriver import Chrome as Chrome_UC
 
-import cloudscraper
+# import cloudscraper
 from requests import Response
 from requests_html import HTMLSession, HTMLResponse, HTML
 
