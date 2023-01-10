@@ -143,6 +143,7 @@ def start_parse(link: str):
           "НИКАК НЕ ВЗАИМОДЕЙСТВУЙТЕ С ЭТИМ ОКНОМ!!")
     print("ПОКА ЭТО ОКНО САМО НЕ ЗАКРОЕТСЯ НЕ ПЕРЕКЛЮЧАЙТЕСЬ НА ДРУГИЕ ОКНА!!!!!!!")
     print("Открывается ссылка, введенная пользователем")
+    print(url)
     browser.get(url)
     time.sleep(time_wait)
     main_title = browser.find_element(by=By.XPATH,
