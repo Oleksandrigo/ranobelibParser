@@ -64,6 +64,7 @@ def get_all_chapters(browser: WebDriver) -> list[tuple[str, str]]:
     data = HTML(html=browser.page_source)
     print("Браузер закрывается, так и должно быть.")
 
+    browser.close()
     browser.quit()
 
     chapters_divs = data.find("div.popup__content")
