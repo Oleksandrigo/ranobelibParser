@@ -1,7 +1,9 @@
 import os
 import time
+from pprint import pprint
 
 from docx import Document
+from docx.document import Document as D_anot
 from docx.shared import RGBColor
 from docx.text.paragraph import Paragraph
 from htmldocx import HtmlToDocx
@@ -15,7 +17,6 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from undetected_chromedriver import Chrome as Chrome_UC
 
-# import cloudscraper
 from requests import Response
 from requests_html import HTMLSession, HTMLResponse, HTML
 
@@ -84,19 +85,13 @@ def get_all_chapters(browser: WebDriver) -> list[tuple[str, str]]:
 
 
 def parse_chapers(name_title: str, chapters: list[tuple[str, str]]):
-    # print("Создание скрапера CloudFire")
-    # scraper = cloudscraper.create_scraper()
-    # print("Получение HTML")
-    # r = scraper.get(url)
-    # print("Запихивается в requsts-html")
-    # res = HTML(html=r.text)
     browser_args = [
         "--no-sandbox",
         "--disable-blink-features=AutomationControlled",
         "--ignore-certificate-errors"
     ]
     session = HTMLSession(browser_args=browser_args)
-    doc_file = Document()
+    doc_file: D_anot = Document()
     new_parser = HtmlToDocx()
 
     for num, (name, url_chapt) in enumerate(chapters):
@@ -128,6 +123,7 @@ def parse_chapers(name_title: str, chapters: list[tuple[str, str]]):
                     new_parser.add_html_to_document(datas[0].html, doc_file)
                     break
 
+    name_title = name_title.replace(":", " ")
     doc_file.save(f'{name_title}.docx')
 
 

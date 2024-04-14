@@ -1,6 +1,6 @@
 @echo off
 
-call "%~dp0venv\Scripts\activate"
+call "%~dp0.venv\Scripts\activate"
 
 cd "%~dp0"
 
