@@ -71,7 +71,7 @@ def get_all_chapters(browser: WebDriver) -> list[tuple[str, str]]:
     try:
         chapters_divs = chapters_divs[0].find("div.modal__body")[0].find("a")
     except Exception:
-        print("Не найден список глав на странице. БААААГ")
+        print("Не найден список глав на странице. Скорее всего вы не смотреи в окно этого браузера.")
         quit()
 
     chapters = []
